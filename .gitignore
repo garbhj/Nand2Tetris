@@ -1,0 +1,15 @@
+# Python cache
+__pycache__/
+*.py[cod]
+
+# Virtual environments
+venv/
+
+# OS-specific files
+.DS_Store
+
+# PyCharm project settings
+.idea/
+
+# Other
+/experiments.py
