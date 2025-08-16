@@ -39,15 +39,13 @@ M=D
 M=M+1
 @SP
 D=M
+@LCL
+M=D
 @5
 D=D-A
 @0
 D=D-A
 @ARG
-M=D
-@SP
-D=M
-@LCL
 M=D
 @Sys.init
 0;JMP
@@ -58,7 +56,7 @@ M=D
 A=M
 D=A
 @SP
-A=M
+M=D
 // push argument 0
 @ARG
 D=M
@@ -126,7 +124,7 @@ D=M
 @R14
 M=D
 @SP
-A=M
+AM=M-1
 D=M
 @ARG
 A=M
@@ -222,15 +220,13 @@ M=D
 M=M+1
 @SP
 D=M
+@LCL
+M=D
 @5
 D=D-A
 @1
 D=D-A
 @ARG
-M=D
-@SP
-D=M
-@LCL
 M=D
 @Main.fibonacci
 0;JMP
@@ -298,15 +294,13 @@ M=D
 M=M+1
 @SP
 D=M
+@LCL
+M=D
 @5
 D=D-A
 @1
 D=D-A
 @ARG
-M=D
-@SP
-D=M
-@LCL
 M=D
 @Main.fibonacci
 0;JMP
@@ -328,7 +322,7 @@ D=M
 @R14
 M=D
 @SP
-A=M
+AM=M-1
 D=M
 @ARG
 A=M
@@ -365,7 +359,7 @@ A=M
 A=M
 D=A
 @SP
-A=M
+M=D
 // push constant 4
 @4
 D=A
@@ -412,15 +406,13 @@ M=D
 M=M+1
 @SP
 D=M
+@LCL
+M=D
 @5
 D=D-A
 @1
 D=D-A
 @ARG
-M=D
-@SP
-D=M
-@LCL
 M=D
 @Main.fibonacci
 0;JMP

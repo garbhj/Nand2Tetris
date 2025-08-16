@@ -98,9 +98,9 @@ def run():
     files = [
         "files/BasicLoop/BasicLoop.vm",
         "files/FibonacciSeries/FibonacciSeries.vm",
+        "files/SimpleFunction/SimpleFunction.vm",
         "files/FibonacciElement",
         "files/NestedCall",
-        "files/SimpleFunction",
         "files/StaticsTest"
     ]
 

@@ -248,11 +248,11 @@ class Writer(list):
             self.extend([f"@{segment}", "D=M", "@SP", "A=M", "M=D", "@SP", "M=M+1"])
 
         self.extend([
-            # Repositions ARG to first argument = SP - 5(4 stored segments + 1 return address) - nArgs
-            "@SP", "D=M", "@5", "D=D-A", f"@{nArgs}", "D=D-A", "@ARG", "M=D",
-
             # Repositions LCL to SP
             "@SP", "D=M", "@LCL", "M=D",
+
+            # Repositions ARG to first argument = SP - 5(4 stored segments + 1 return address) - nArgs
+            "@5", "D=D-A", f"@{nArgs}", "D=D-A", "@ARG", "M=D",
 
             # Jump to function
             f"@{function}", "0;JMP",
@@ -274,7 +274,7 @@ class Writer(list):
                 "M=0", "A=A+1"
             ])
         self.extend([  # Update stack pointer to new location
-            "D=A", "@SP", "A=M"
+            "D=A", "@SP", "M=D"
         ])
 
     def write_return(self):
@@ -294,14 +294,14 @@ class Writer(list):
 
             # Repositions return value from callee to argument 0's spot
             "@SP",  # Get return value
-            "A=M",
+            "AM=M-1",  # To position of top of stack
             "D=M",
             "@ARG",  # Store return value at *ARG
             "A=M",
             "M=D",
 
             # Restore Stack Pointer for caller
-            "D=A",  # Currently at *ARG
+            "D=A",  # Currently @(*ARG) so can take A directly
             "@SP",
             "M=D+1",
         ])

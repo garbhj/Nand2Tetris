@@ -39,15 +39,13 @@ M=D
 M=M+1
 @SP
 D=M
+@LCL
+M=D
 @5
 D=D-A
 @0
 D=D-A
 @ARG
-M=D
-@SP
-D=M
-@LCL
 M=D
 @Sys.init
 0;JMP
@@ -58,7 +56,7 @@ M=D
 A=M
 D=A
 @SP
-A=M
+M=D
 // push argument 0
 @ARG
 D=M
@@ -112,7 +110,7 @@ D=M
 @R14
 M=D
 @SP
-A=M
+AM=M-1
 D=M
 @ARG
 A=M
@@ -149,7 +147,7 @@ A=M
 A=M
 D=A
 @SP
-A=M
+M=D
 // push static 0
 @Class1.0
 D=M
@@ -183,7 +181,7 @@ D=M
 @R14
 M=D
 @SP
-A=M
+AM=M-1
 D=M
 @ARG
 A=M
@@ -220,7 +218,7 @@ A=M
 A=M
 D=A
 @SP
-A=M
+M=D
 // push constant 6
 @6
 D=A
@@ -275,15 +273,13 @@ M=D
 M=M+1
 @SP
 D=M
+@LCL
+M=D
 @5
 D=D-A
 @2
 D=D-A
 @ARG
-M=D
-@SP
-D=M
-@LCL
 M=D
 @Class1.set
 0;JMP
@@ -348,15 +344,13 @@ M=D
 M=M+1
 @SP
 D=M
+@LCL
+M=D
 @5
 D=D-A
 @2
 D=D-A
 @ARG
-M=D
-@SP
-D=M
-@LCL
 M=D
 @Class2.set
 0;JMP
@@ -405,15 +399,13 @@ M=D
 M=M+1
 @SP
 D=M
+@LCL
+M=D
 @5
 D=D-A
 @0
 D=D-A
 @ARG
-M=D
-@SP
-D=M
-@LCL
 M=D
 @Class1.get
 0;JMP
@@ -456,15 +448,13 @@ M=D
 M=M+1
 @SP
 D=M
+@LCL
+M=D
 @5
 D=D-A
 @0
 D=D-A
 @ARG
-M=D
-@SP
-D=M
-@LCL
 M=D
 @Class2.get
 0;JMP
@@ -480,7 +470,7 @@ M=D
 A=M
 D=A
 @SP
-A=M
+M=D
 // push argument 0
 @ARG
 D=M
@@ -534,7 +524,7 @@ D=M
 @R14
 M=D
 @SP
-A=M
+AM=M-1
 D=M
 @ARG
 A=M
@@ -571,7 +561,7 @@ A=M
 A=M
 D=A
 @SP
-A=M
+M=D
 // push static 0
 @Class2.0
 D=M
@@ -605,7 +595,7 @@ D=M
 @R14
 M=D
 @SP
-A=M
+AM=M-1
 D=M
 @ARG
 A=M

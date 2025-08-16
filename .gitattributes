@@ -1,0 +1,5 @@
+*.hack linguist-detectable=false
+*.asm  linguist-detectable=false
+*.vm   linguist-detectable=false
+*.tst  linguist-detectable=false
+*.cmp  linguist-detectable=false
