@@ -11,9 +11,16 @@ class Writer(list):
         self.include_comments = True
         self.comp_counter = 0
         self.file_name = file_name
+        self.call_counter_by_function = {}
+        self.current_function = None
 
     def set_file_name(self, file_name):
         self.file_name = file_name
+
+    def write_init(self):
+        # Writes the bootstrap code; sets SP = 256 and calls Sys.init
+        self.extend(["@256", "D=A", "@SP", "M=D"])
+        self.write_call("Sys.init", 0)
 
     def write_line(self, parser):
         command_type, arg_1, arg_2 = parser.parse_line()
@@ -31,20 +38,16 @@ class Writer(list):
             return self.write_pop(arg_1, int(arg_2))
 
         # Branching Commands
-        elif command_type == "C_LABEL":
-            return self.write_label(arg_1)
-        elif command_type == "C_GOTO":
-            return self.write_goto(arg_1)
-        elif command_type == "C_IF":
-            return self.write_if_goto(arg_1)
+        elif command_type in ["C_LABEL", "C_GOTO", "C_IF"]:
+            return self.write_branching(command_type, arg_1)
 
         # Function Commands
-        elif command_type == "C_FUNCTION":
-            return self.write_label(arg_1)
+        elif command_type in ["C_FUNCTION"]:
+            return self.write_function(arg_1, int(arg_2))
         elif command_type == "C_CALL":
-            return self.write_goto(arg_1)
+            return self.write_call(arg_1, int(arg_2))
         elif command_type == "C_RETURN":
-            return self.write_if_goto(arg_1)
+            return self.write_return()
 
     def write_arithemetic(self, command):
         if command in ["add", "sub", "and", "or"]:
@@ -148,10 +151,11 @@ class Writer(list):
         else:
             raise ValueError(f"Unknown segment for push command: {segment}")
 
+        # Place the value onto the stack
         self.extend([
-            "@SP",  # Store value in address
+            "@SP",  # Go to top of stack
             "A=M",
-            "M=D",
+            "M=D",  # Place value
             "@SP",  # Increment SP
             "M=M+1"
         ])
@@ -202,30 +206,117 @@ class Writer(list):
                 "@SP",
                 "AM=M-1",  # Decrement stack pointer, move memory to top value
                 "D=M",
-                f"@{5 + index}",  # Store value in address
+                f"@{5 + index}",  # Store value in segment address
                 "M=D"
             ])
         else:
             raise ValueError(f"Unknown segment for push command: {segment}")
 
-    def write_label(self, label):
-        self.append(f"({label})")  # Set label
+    def write_branching(self, command, label):
+        # Ensure unique labels:
+        # functionName.label to prevent label collisions between functions
+        if self.current_function:
+            label = f"{self.current_function}${label}"
 
-    def write_goto(self, label):
+        if command == "C_LABEL":
+            self.append(f"({label})")  # Set label
+        elif command == "C_GOTO":
+            self.extend([
+                f"@{label}",  # Unconditional jump to label
+                "0;JMP"
+            ])
+        elif command == "C_IF":
+            self.extend([
+                "@SP",  # Pop top element
+                "AM=M-1",
+                "D=M",
+                f"@{label}",  # Jump if popped element != 0 (i.e. not false)
+                "D;JNE"
+            ])
+
+    def write_call(self, function, nArgs):
+        # Determine return label by index
+        count = self.call_counter_by_function.get(function, 0)
+        return_label = f"{function}$ret.{count}"
+        self.call_counter_by_function[function] = count + 1
+
+        # Push return address of caller (label added at end)
+        self.extend([f"@{return_label}", "D=A", "@SP", "A=M", "M=D", "@SP", "M=M+1"])
+
+        # Push segment pointers of caller
+        for segment in ("LCL", "ARG", "THIS", "THAT"):
+            self.extend([f"@{segment}", "D=M", "@SP", "A=M", "M=D", "@SP", "M=M+1"])
+
         self.extend([
-            f"@{label}",  # Unconditional jump to label
-            "0;JMP"
+            # Repositions ARG to first argument = SP - 5(4 stored segments + 1 return address) - nArgs
+            "@SP", "D=M", "@5", "D=D-A", f"@{nArgs}", "D=D-A", "@ARG", "M=D",
+
+            # Repositions LCL to SP
+            "@SP", "D=M", "@LCL", "M=D",
+
+            # Jump to function
+            f"@{function}", "0;JMP",
+            
+            # Add return address label
+            f"({return_label})"
         ])
 
-    def write_if_goto(self, label):
+    def write_function(self, function, nVars):
+        count = self.current_function = function
+
+        # Note; self.write_push("constant", 0) isn't used for efficiency.
         self.extend([
+            f"({function})",  # Create function label (Note: compiled bytecode already uses Xxx.funcName)
+            "@SP", "A=M"  # Go to stack pointer
+        ])
+        for i in range(nVars):  # Add a zero for each local variable
+            self.extend([
+                "M=0", "A=A+1"
+            ])
+        self.extend([  # Update stack pointer to new location
+            "D=A", "@SP", "A=M"
+        ])
+
+    def write_return(self):
+        self.extend([
+            # Stores LCL as end_frame address in R13 (as LCL will be changed)
+            "@LCL",
+            "D=M",
+            "@R13",  # end_frame
+            "M=D",
+
+            # Stores return address in R14 (or might get overwritten if no arguments)
+            "@5",
+            "A=D-A",  # Get to end_frame - 5
+            "D=M",
+            "@R14",  # return_address
+            "M=D",
+
+            # Repositions return value from callee to argument 0's spot
+            "@SP",  # Get return value
+            "A=M",
+            "D=M",
+            "@ARG",  # Store return value at *ARG
+            "A=M",
+            "M=D",
+
+            # Restore Stack Pointer for caller
+            "D=A",  # Currently at *ARG
             "@SP",
-            "AM=M-1"
-            "D=M"
-            f"@{label}",  # Jump if popped element != 0 (i.e. not false)
-            "D;JNE"
+            "M=D+1",
         ])
 
+        # Restores the segment pointers of the caller
+        for segment in ("THAT", "THIS", "ARG", "LCL"):
+            self.extend([
+                "@R13",  # Calculate stored address = end_frame - i
+                "AM=M-1",  # Decrement end frame
+                "D=M",  # Restores value to the caller's segment
+                f"@{segment}",
+                "M=D"
+            ])
 
-
-
+        # Goto return address stored in R14
+        self.extend([
+            "@R14", "A=M", "0;JMP"
+        ])

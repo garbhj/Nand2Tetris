@@ -113,7 +113,9 @@ M=D
 M=M+1
 // if-goto LOOP
 @SP
-AM=M-1D=M@LOOP
+AM=M-1
+D=M
+@LOOP
 D;JNE
 // push local 0
 @LCL
