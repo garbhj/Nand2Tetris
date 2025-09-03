@@ -1,0 +1,76 @@
+//  for (infinite loop):
+//      check the value of the keyboard address
+//  	if (value > 0):
+//  	    goto screen address and set all to 1
+//  	if (value == 0):
+//	    goto screen address and set all to 0
+// 
+
+
+//LOOP:
+//	if KEYBOARD > 0 goto BLACK
+	if KEYBOARD == 0 got WHITE
+
+//WHITE:
+//	color = 0
+//	goto FILL
+
+//BLACK:
+//	color = -1
+//	goto FILL
+
+//FILL:
+//	current=SCREEN
+//FILL_LOOP:
+//	if current >= KEYBOARD goto LOOP
+//	RAM[current] = color
+//	current = current + 1
+
+(LOOP)
+   @KBD
+   D=M
+   @BLACK
+   D;JGT
+
+   @fill
+   M=0
+   @FILL
+   0;JMP
+
+(BLACK)
+   @fill
+   M=-1
+
+(FILL)
+   @SCREEN
+   D=A
+   @current
+   M=D
+
+(FILL_LOOP)
+   @current
+   D=M
+   @KBD
+   D=D-A
+   @LOOP
+   D;JGE
+   
+   @fill
+   D=M
+   @current
+   A=M
+   M=D
+
+   @current
+   M=M+1
+   
+   @FILL_LOOP
+   0;JMP
+
+
+
+
+
+
+
+

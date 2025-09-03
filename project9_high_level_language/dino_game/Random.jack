@@ -1,0 +1,34 @@
+class Random {
+
+    field int seed;
+
+    /** Constructs a new Random object with a seed. */
+    constructor Random new(int s) {
+        let seed = s;
+        return this;
+    }
+
+    method void dispose() {
+        do Memory.deAlloc(this);
+        return;
+    }
+
+    /** Returns the next random number (0..max-1). */
+    method int nextInt(int max) {
+        var int p, a, b;
+        var int temp_val;
+
+        let p = 8191; // Our explicit modulus
+        let a = 884;  // Multiplier
+        let b = 0;  // Increment
+
+        // 1. Calculate the next value in the sequence with an EXPLICIT modulo p.
+        // The seed's value is always kept in the range [0, p-1].
+        let seed = (seed * a) + b;
+        let seed = seed - ((seed / p) * p); // This is 'seed = seed % p'
+
+        // 2. The new 'seed' is our random number, which is then scaled down to the max
+        let temp_val = seed;
+        return temp_val - ((temp_val / max) * max); // This is 'temp_val % max'
+    }
+}

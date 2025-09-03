@@ -1,0 +1,31 @@
+// This file is part of www.nand2tetris.org
+// and the book "The Elements of Computing Systems"
+// by Nisan and Schocken, MIT Press.
+// File name: projects/3/a/PC.hdl
+/**
+ * A 16-bit counter.
+ * if      reset(t): out(t+1) = 0
+ * else if load(t):  out(t+1) = in(t)
+ * else if inc(t):   out(t+1) = out(t) + 1
+ * else              out(t+1) = out(t)
+ */
+CHIP PC {
+    IN in[16], reset, load, inc;
+    OUT out[16];
+    
+    PARTS:
+    //// Replace this comment with your code.
+    //// Use a register, an incrementor, and some other chips to do this.
+    Inc16(in= regout, out= incr);
+
+    // Select stay same or increment
+    Mux16(a= regout, b= incr, sel= inc, out= incsel);
+    // Select prev. or load 
+    Mux16(a= incsel, b= in, sel= load, out= sel2);
+    // Select prev. or reset
+    Mux16(a= sel2, b[0..15]= false, sel= reset, out= final);
+
+    // Note that this order ensures the same order as the above if statements
+
+    Register(in= final, load= true, out= out, out= regout);
+}

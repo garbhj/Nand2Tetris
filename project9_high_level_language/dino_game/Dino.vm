@@ -1,0 +1,230 @@
+function Dino.new 0
+    push constant 8
+    call Memory.alloc 1
+    pop pointer 0
+    push argument 0
+    pop this 1
+    push argument 1
+    pop this 2
+    push argument 1
+    pop this 0
+    push argument 2
+    pop this 3
+    push argument 2
+    pop this 4
+    push constant 0
+    pop this 5
+    push constant 0
+    pop this 6
+    push constant 0
+    pop this 7
+    push pointer 0
+    return
+function Dino.dispose 0
+    push argument 0
+    pop pointer 0
+    push pointer 0
+    call Memory.deAlloc 1
+    pop temp 0
+    push constant 0
+    return
+function Dino.draw 0
+    push argument 0
+    pop pointer 0
+    push constant 1
+    neg
+    call Screen.setColor 1
+    pop temp 0
+    push this 1
+    push this 2
+    push this 1
+    push this 3
+    add
+    push this 2
+    push this 4
+    add
+    call Screen.drawRectangle 4
+    pop temp 0
+    push constant 0
+    return
+function Dino.erase 0
+    push argument 0
+    pop pointer 0
+    push constant 0
+    call Screen.setColor 1
+    pop temp 0
+    push this 1
+    push this 2
+    push this 1
+    push this 3
+    add
+    push this 2
+    push this 4
+    add
+    call Screen.drawRectangle 4
+    pop temp 0
+    push constant 0
+    return
+function Dino.jump 0
+    push argument 0
+    pop pointer 0
+    push this 5
+    not
+    push this 2
+    push this 0
+    lt
+    push this 2
+    push this 0
+    eq
+    or
+    and
+    not
+    if-goto Dino_1
+    push constant 1
+    neg
+    pop this 5
+    push constant 12
+    neg
+    pop this 7
+    goto Dino_0
+label Dino_1
+label Dino_0
+    push constant 0
+    return
+function Dino.setCrouching 0
+    push argument 0
+    pop pointer 0
+    push argument 1
+    pop this 6
+    push constant 0
+    return
+function Dino.update 0
+    push argument 0
+    pop pointer 0
+    push pointer 0
+    call Dino.erase 1
+    pop temp 0
+    push this 5
+    not
+    if-goto Dino_3
+    push this 2
+    push this 7
+    add
+    pop this 2
+    push this 7
+    push constant 1
+    add
+    pop this 7
+    push this 2
+    push this 0
+    gt
+    push this 2
+    push this 0
+    eq
+    or
+    not
+    if-goto Dino_5
+    push this 0
+    pop this 2
+    push constant 0
+    pop this 5
+    goto Dino_4
+label Dino_5
+label Dino_4
+    goto Dino_2
+label Dino_3
+label Dino_2
+    push this 5
+    not
+    not
+    if-goto Dino_7
+    push this 6
+    not
+    not
+    if-goto Dino_9
+    push this 3
+    pop this 4
+    push this 0
+    pop this 2
+    goto Dino_8
+label Dino_9
+label Dino_8
+    push this 6
+    not
+    if-goto Dino_11
+    push this 3
+    push constant 10
+    sub
+    pop this 4
+    push this 0
+    push constant 10
+    add
+    pop this 2
+    goto Dino_10
+label Dino_11
+label Dino_10
+    goto Dino_6
+label Dino_7
+label Dino_6
+    push pointer 0
+    call Dino.draw 1
+    pop temp 0
+    push constant 0
+    return
+function Dino.collidesWith 0
+    push argument 0
+    pop pointer 0
+    push this 1
+    push this 3
+    add
+    push argument 1
+    call Cactus.getX 1
+    gt
+    push this 1
+    push argument 1
+    call Cactus.getX 1
+    push argument 1
+    call Cactus.getSize 1
+    add
+    lt
+    and
+    push this 2
+    push this 3
+    add
+    push argument 1
+    call Cactus.getY 1
+    gt
+    and
+    push this 2
+    push argument 1
+    call Cactus.getY 1
+    push argument 1
+    call Cactus.getSize 1
+    add
+    lt
+    and
+    not
+    if-goto Dino_13
+    push constant 1
+    neg
+    return
+    goto Dino_12
+label Dino_13
+label Dino_12
+    push constant 0
+    return
+function Dino.getX 0
+    push argument 0
+    pop pointer 0
+    push this 1
+    return
+function Dino.getY 0
+    push argument 0
+    pop pointer 0
+    push this 2
+    return
+function Dino.getSize 0
+    push argument 0
+    pop pointer 0
+    push this 3
+    return

@@ -1,0 +1,16 @@
+/**
+ * The Main class initializes a new Dino game and starts it.
+ */
+class Main {
+
+    /** Initializes a new game and starts it. */    
+    function void main() {
+        var DinoGame game;
+
+        let game = DinoGame.new(140);
+        do game.run();
+        do game.dispose();
+
+        return;
+    }
+}

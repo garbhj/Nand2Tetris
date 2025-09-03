@@ -1,0 +1,99 @@
+class Dino {
+
+    field int ground;
+    field int x;
+    field int y;
+    field int size;
+    field int height;
+    field boolean isJumping;
+    field boolean isCrouching;
+    field int velocity;
+
+    constructor Dino new(int startX, int startY, int s) {
+        let x = startX;
+        let y = startY;
+        let ground = startY;  // original y-position
+        let size = s;
+        let height = s;
+        let isJumping = false;
+        let isCrouching = false;
+        let velocity = 0;
+        return this;
+    }
+
+    method void dispose() {
+        do Memory.deAlloc(this);
+        return;
+    }
+
+    /** Draws the dino */
+    method void draw() {
+        do Screen.setColor(true);
+        do Screen.drawRectangle(x, y, x + size, y + height);
+        return;
+    }
+
+    method void erase() {
+        do Screen.setColor(false);
+        do Screen.drawRectangle(x, y, x + size, y + height);
+        return;
+    }
+
+    /** Jump mechanic */
+    method void jump() {
+        if ((~isJumping) & ((y < ground) | (y = ground))) {
+            let isJumping = true;
+            let velocity = -12;  // upward
+        }
+        return;
+    }
+
+    /** Crouch mechanic */
+    method void setCrouching(boolean crouch) {
+        let isCrouching = crouch;
+        return;
+    }
+
+    method void update() {
+        do erase();
+        if (isJumping) {
+            let y = y + velocity;
+            let velocity = velocity + 1;  // gravity
+            if ((y > ground) | (y = ground)) {
+                let y = ground;
+                let isJumping = false;
+            }
+        }
+
+        if (~isJumping) {
+            if ((~isCrouching)) {
+                let height = size;
+                let y = ground; // restore top when standing
+            }
+            if (isCrouching) {
+                let height = size - 10;
+                let y = ground + 10; // Move top down when crouching
+            }
+        }
+
+        do draw();
+        return;
+    }
+
+    /** Collision check */
+    method boolean collidesWith(Cactus c) {
+        if ((x + size > c.getX()) &             // right of left bound
+            (x < (c.getX() + c.getSize())) &    // left of right bound
+            (y + size > c.getY()) &             // below the top bound
+            (y < (c.getY() + c.getSize())))     // above the bottom bound
+            {
+            return true;
+        }
+        return false;
+    }
+
+    // Getters
+    method int getX() { return x; }
+    method int getY() { return y; }
+    method int getSize() { return size; }
+}

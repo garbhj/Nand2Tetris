@@ -1,0 +1,54 @@
+class Cactus {
+
+    field int x;
+    field int y;
+    field int size;
+    field Random rng;
+
+    constructor Cactus new(int startX, int startY, int s, Random generator) {
+        let x = startX;
+        let y = startY;
+        let size = s;
+        let rng = generator;
+        return this;
+    }
+
+    method void dispose() {
+        do Memory.deAlloc(this);
+        return;
+    }
+
+    method void draw() {
+        do Screen.setColor(true);
+        do Screen.drawRectangle(x, y, Math.min(x + size, 502), y + size);
+        return;
+    }
+
+    method void erase() {
+        do Screen.setColor(false);
+        do Screen.drawRectangle(x, y, Math.min(x + size, 502), y + size);
+        return;
+    }
+
+    method void move(int speed) {
+        // var boolean onScreen;
+        // let onScreen = ;
+
+        if ((x < 500) & (x > 0)) {
+            do erase();
+        }
+        let x = x - speed;
+        if (x < 0) {
+            let x = 900 + rng.nextInt(500); // reset off-screen
+        }
+        if ((x < 500) & (x > 0)) {
+            do draw();
+        }
+        return;
+    }
+
+    // Getters
+    method int getX() { return x; }
+    method int getY() { return y; }
+    method int getSize() { return size; }
+}

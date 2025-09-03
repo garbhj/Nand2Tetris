@@ -1,0 +1,60 @@
+//  inputs a and b
+//  take positive of a and b
+//  
+//  for (i=0, i<positive_of_b, i++):
+//      add the value of positive of a
+//      to a running total.
+//  
+//  store the value
+
+
+//a = RAM[0]
+//b = RAM[1]
+
+//sum = 0
+//iter = 0
+
+//LOOP:
+//	if iter >= a goto END  // (i.e. iter - a >= 0)
+//	sum = sum + b
+//	iter = iter + 1=
+
+//END: 
+//	goto END
+
+
+   @iter  // iterate from 0 to R1
+   M=0
+ 
+   @R2	
+   M=0 
+ 
+   @R1
+   D=M
+
+(LOOP)
+   @R0
+   D=M
+   @iter
+   D=M-D
+   @END
+   D;JGE  // if (iter - R0 >= 0) goto END
+	
+   // R2 = R2 + R1
+   @R2
+   D=M
+   @R1
+   D=D+M
+   @R2
+   M=D
+	
+   // iter = iter + 1
+   @iter
+   M=M+1
+
+   @LOOP
+   0;JMP
+	
+	
+(END)
+   0;JMP

@@ -1,0 +1,156 @@
+/**
+ * Implements the Dinosaur game.
+ * In this game you play as a dinosaur that can jump (up-arrow) and crouch (down-arrow)
+ * to avoid obstacles (cacti and pterodactyls) that approach from the right.
+ * In the beginning, the square is located at the top-left corner
+ * of the screen. The arrow keys are used to move the square.
+ * The 'z' & 'x' keys are used to decrement and increment the size.
+ * The 'q' key is used to quit the game.
+ */
+class DinoGame {
+
+    field Dino dino;
+    field Array cacti;
+    field int speed; 
+    field int score;
+    field int ground;
+    field int cacheight;
+    field Random rng;
+
+    /** Constructs a new DinoGame. */
+    constructor DinoGame new(int grnd) {
+        let cacheight = 15;
+        let ground = grnd;
+
+        let dino = Dino.new(20, ground-20, 20);   // x, y, size
+        let score = 0;
+        let cacti = Array.new(5);
+
+        return this;
+    }
+
+    /** Deallocates memory. */
+    method void dispose() {
+        var int i;
+        var Cactus c;
+
+        do dino.dispose();
+        do rng.dispose();
+        let i = 0;
+        while (i < 5) {
+            let c = cacti[i];
+            do c.dispose();
+            let i = i + 1;
+        }
+        do Memory.deAlloc(cacti);
+        do Memory.deAlloc(this);
+        return;
+    }
+
+    /** Starts the game loop. */
+    method void run() {
+        var char key;
+        var boolean exit;
+        var boolean start;
+        var int seed;
+
+        let seed = 0;
+
+        let start = false;
+        while (~start) {
+            let key = Keyboard.keyPressed();
+
+            if ((key = 131) | (key = 32)) {
+                let start = true;
+            }
+
+            let seed = seed + 1;
+            do Sys.wait(1);
+        }
+        
+        let rng = Random.new(seed);
+        let cacti[0] = Cactus.new(600 + rng.nextInt(150), ground-cacheight, cacheight, rng);
+        let cacti[1] = Cactus.new(800 + rng.nextInt(150), ground-cacheight, cacheight, rng);
+        let cacti[2] = Cactus.new(1000 + rng.nextInt(150), ground-cacheight, cacheight, rng);
+        let cacti[3] = Cactus.new(1200 + rng.nextInt(150), ground-cacheight - 15, cacheight, rng);
+        let cacti[4] = Cactus.new(1400 + rng.nextInt(150), ground-cacheight - 40, cacheight, rng);
+
+        do Output.moveCursor(0, 0);
+        do Output.printString("Score: ");
+
+        let exit = false;
+        while (~exit) {
+            let key = Keyboard.keyPressed();
+
+            if (key = 81) {    // 'q' quits
+                let exit = true;
+            }
+            if ((key = 131) | (key = 32)) {  // up arrow or space
+                do dino.jump();
+            }
+            if (key = 133) {
+                do dino.setCrouching(true);
+            } else {
+                do dino.setCrouching(false);
+            }
+            
+            // Print the score at top left
+            do Output.moveCursor(0, 7);
+            do Output.printInt(score);
+            
+            // Update positions and display of sprites
+            do dino.update();
+            do updateCacti();
+            let exit = checkCollisions();
+
+            do Sys.wait(5); // short delay between frames
+            let score = score + 1;
+
+            let speed = Math.min(16, (3 + (score/1000)));
+            if (speed < 3) {
+                let speed = 3;
+            }
+        }
+
+        return;
+    }
+
+    /** Updates cacti positions. */
+    method void updateCacti() {
+        var int i;
+        var Cactus c;
+
+        let i = 0;
+        while (i < 5) {
+            let c = cacti[i];
+            do c.move(speed);
+            let i = i + 1;
+        }
+        return;
+    }
+
+    /** Checks if any cactus collides with the dino. */
+    method boolean checkCollisions() {
+        var int i;
+        var Cactus c;
+        var boolean collision;
+        let collision = false;
+
+        let i = 0;
+        while (i < 5) {
+            let c = cacti[i];
+            if (c.getX() < 80) {  // Filter some out
+                if (dino.collidesWith(c)) {
+                    do Output.println();
+                    do Output.println();
+                    do Output.printString("Game Over");
+                    do Sys.wait(1000);
+                    let collision = true;
+                    let i = 5; // force exit loop
+                }
+            }
+            let i = i + 1;
+        }
+        return collision;
+    }
+}
